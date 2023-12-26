@@ -46,17 +46,21 @@ output:
     inverted: true
 
 sensor:
-- platform: adc
-  pin: A0
-  id: "adcMoistureRaw"
-  accuracy_decimals: 5
-  name: "Plant - Moisture Level and Raw Sensor Data"
-  update_interval: 30s
-  filters:
-    - calibrate_linear:
-      - 0.29  -> 100.0
-      - 0.62 -> 0
-  unit_of_measurement: '%'
-  device_class: voltage
-  state_class: measurement
-  raw: False
+  - platform: adc
+    pin: A0
+    id: "adcRaw_Moisture"
+    accuracy_decimals: 5
+    name: "Plant - Raw Moisture"
+    update_interval: 30s
+
+  - platform: template
+    id: "moisture_sensor"
+    name: "Plant - Moisture Level"
+    lambda: |-
+      return (id(adcRaw_Moisture).state - 0.62) / (0.29 - 0.62) * 100.0;
+    unit_of_measurement: '%'
+    update_interval: 30s
+
+  - platform: wifi_signal
+    name: "Plant - WiFi Signal Sensor"
+    update_interval: 30s
